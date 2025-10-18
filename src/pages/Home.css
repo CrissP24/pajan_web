@@ -1,0 +1,578 @@
+/* Home Page Styles */
+.home-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Content Section */
+.content-section {
+  padding: 4rem 0;
+  background: white;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.lead {
+  font-size: 1.25rem;
+  color: #475569;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+/* Dynamic Content */
+.dynamic-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-block {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.content-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid #3b82f6;
+  padding-bottom: 0.5rem;
+}
+
+.content-image-container {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.content-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.content-body {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #475569;
+}
+
+.content-body p {
+  margin-bottom: 1rem;
+}
+
+.content-body h1, .content-body h2, .content-body h3 {
+  color: #1e293b;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Default Content */
+.default-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-item h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.feature-item p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Info Card */
+.info-card {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.info-card h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.contact-info p {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.contact-info strong {
+  color: #bfdbfe;
+}
+
+/* Services Section */
+.services-section {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+/* News Section */
+.news-section {
+  padding: 4rem 0;
+  background: white;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.news-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  height: 100%;
+  text-align: center;
+  padding: 2.5rem 2rem;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.news-image-container {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-image {
+  transform: scale(1.05);
+}
+
+.news-content {
+  padding: 0;
+}
+
+.news-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  gap: 1rem;
+}
+
+.news-category {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.news-date {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.news-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.news-excerpt {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-read-more {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.news-read-more:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.no-news {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.no-news p {
+  font-size: 1.1rem;
+  color: #64748b;
+}
+
+.service-card {
+  background: white;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.service-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.service-card h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.service-card p {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 50vh;
+    min-height: 400px;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .content-block {
+    padding: 1.5rem;
+  }
+  
+  .content-title {
+    font-size: 1.5rem;
+  }
+  
+  .service-card {
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .news-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .news-card {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    height: 40vh;
+    min-height: 300px;
+  }
+  
+  .content-section,
+  .services-section,
+  .news-section {
+    padding: 2rem 0;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+  }
+  
+  .lead {
+    font-size: 1.1rem;
+  }
+  
+  .info-card {
+    margin-top: 2rem;
+  }
+  
+  .news-content {
+    padding: 0;
+  }
+  
+  .news-title {
+    font-size: 1.1rem;
+  }
+  
+  .news-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-block,
+.feature-item,
+.service-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Loading Animation */
+.loading-container .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-outline-primary {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-outline-light {
+  border-color: white;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+  background: white;
+  color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+/* Transparency Section Styles */
+.transparency-section {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+}
+
+.transparency-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23ffffff" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="%23ffffff" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  pointer-events: none;
+}
+
+.transparency-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.transparency-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.transparency-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.transparency-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.transparency-card h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.transparency-card p {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.transparency-card .btn {
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments for transparency section */
+@media (max-width: 768px) {
+  .transparency-section {
+    padding: 3rem 0;
+  }
+  
+  .transparency-card {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .transparency-icon {
+    font-size: 2.5rem;
+  }
+  
+  .transparency-card h4 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .transparency-section {
+    padding: 2rem 0;
+  }
+  
+  .transparency-card {
+    padding: 1.5rem;
+  }
+  
+  .transparency-icon {
+    font-size: 2rem;
+  }
+} 

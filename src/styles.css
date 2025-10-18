@@ -1,0 +1,408 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F5F6F5;
+    /* pajan-gray */
+}
+
+/* Estilos globales de accesibilidad WCAG 2.1 AA */
+:root {
+    --focus-color: #007bff;
+    --focus-offset: 2px;
+    --high-contrast-text: #000000;
+    --high-contrast-bg: #ffffff;
+    --high-contrast-border: #000000;
+}
+
+/* Mejoras de accesibilidad para navegación por teclado */
+*:focus {
+    outline: 2px solid var(--focus-color);
+    outline-offset: var(--focus-offset);
+}
+
+/* Skip links para navegación rápida */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #007bff;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 10000;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Mejoras para lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Contraste mejorado para texto */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Estados de hover mejorados */
+.btn:hover,
+.nav-link:hover,
+.dropdown-item:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+/* Animaciones reducidas para usuarios sensibles */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.app-container {
+    min-height: 100vh;
+}
+
+/* Contact Bar */
+.contact-bar {
+    font-size: 0.9rem;
+}
+
+/* Header */
+.header {
+    padding: 1.5rem 0;
+}
+
+.logo {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+}
+
+.site-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #003087;
+    /* pajan-blue */
+}
+
+.site-subtitle {
+    font-size: 0.9rem;
+    color: #4B5563;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6B7280;
+}
+
+.error-message {
+    font-size: 0.9rem;
+}
+
+/* Navigation */
+.main-nav {
+    background-color: #003087;
+}
+
+.main-nav.scrolled {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #00205B;
+    border-radius: 0.25rem;
+}
+
+.dropdown-menu {
+    background-color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+}
+
+.dropdown-item {
+    font-size: 0.9rem;
+    color: #1F2937;
+}
+
+.dropdown-item:hover {
+    background-color: #F5F6F5;
+}
+
+/* Carousel */
+.carousel-image {
+    height: 28rem;
+    object-fit: cover;
+}
+
+.carousel-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.carousel-caption {
+    text-align: left;
+    max-width: 36rem;
+    bottom: 2rem;
+}
+
+.carousel-category {
+    background-color: #003087;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+}
+
+.carousel-title {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.carousel-date {
+    font-size: 0.9rem;
+}
+
+.carousel-indicators .carousel-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: #9CA3AF;
+    border: none;
+}
+
+.carousel-indicators .carousel-indicator.active {
+    background-color: white;
+}
+
+/* Services */
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1F2937;
+}
+
+.service-card {
+    border-radius: 0.5rem;
+    transition: transform 0.3s;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.service-content {
+    text-align: center;
+}
+
+.service-icon {
+    display: flex;
+    justify-content: center;
+}
+
+.service-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.service-desc {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.service-action {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* News */
+.news-link {
+    color: #2563EB;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.news-link:hover {
+    color: #1E40AF;
+}
+
+.news-card {
+    border: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.news-image {
+    height: 12rem;
+    object-fit: cover;
+}
+
+.news-content {
+    background-color: white;
+}
+
+.news-meta {
+    font-size: 0.9rem;
+}
+
+.news-category {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+}
+
+.news-date {
+    color: #6B7280;
+}
+
+.news-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.news-excerpt {
+    font-size: 0.9rem;
+    color: #4B5563;
+}
+
+.news-read-more {
+    color: #2563EB;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.news-read-more:hover {
+    color: #1E40AF;
+}
+
+/* Footer */
+.footer-logo-img {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+}
+
+.footer-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.footer-subtitle {
+    font-size: 0.9rem;
+    color: #9CA3AF;
+}
+
+.footer-desc {
+    font-size: 0.9rem;
+    color: #9CA3AF;
+}
+
+.social-link {
+    color: #9CA3AF;
+}
+
+.social-link:hover {
+    color: white;
+}
+
+.footer-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.footer-link {
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-link:hover {
+    color: white;
+}
+
+.footer-bottom {
+    border-top-color: #4B5563;
+    color: #9CA3AF;
+    font-size: 0.9rem;
+}
+
+/* Edit Icon */
+.edit-icon {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    color: #2563EB;
+}
+
+.edit-icon:hover {
+    color: #1E40AF;
+}
+
+/* Responsividad */
+@media (max-width: 991px) {
+    .carousel-image {
+        height: 20rem;
+    }
+
+    .carousel-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .site-title {
+        font-size: 1.5rem;
+    }
+
+    .carousel-image {
+        height: 16rem;
+    }
+
+    .carousel-title {
+        font-size: 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    } }
