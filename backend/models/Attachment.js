@@ -98,7 +98,7 @@ const Attachment = sequelize.define('Attachment', {
       fields: ['category']
     },
     {
-      fields: ['isPublic']
+      fields: ['is_public']
     },
     {
       fields: ['document_id']

@@ -132,22 +132,22 @@ const News = sequelize.define('News', {
       fields: ['status']
     },
     {
-      fields: ['isPublic']
+      fields: ['is_public']
     },
     {
-      fields: ['publishedAt']
+      fields: ['published_at']
     },
     {
-      fields: ['isFeatured']
+      fields: ['is_featured']
     },
     {
-      fields: ['isBreaking']
+      fields: ['is_breaking']
     },
     {
       fields: ['priority']
     },
     {
-      fields: ['eventDate']
+      fields: ['event_date']
     },
     {
       fields: ['user_id']

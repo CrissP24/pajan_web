@@ -63,3 +63,17 @@ export const getDashboardStatistics = (period = '30d') =>
     params: { period },
     headers: getAuthHeaders()
   });
+
+// Default export
+export default {
+  getAdminDashboard,
+  getAdminStatistics,
+  getAuditLogs,
+  getSystemInfo,
+  cleanupData,
+  getTicDashboard,
+  getComunicacionDashboard,
+  getParticipacionDashboard,
+  getTransparenciaDashboard,
+  getDashboardStatistics
+};

@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const { Transparencia, User, AuditLog } = require('../models');
-const { authenticateToken, authorize, checkPermission } = require('../middleware/auth');
+const { authenticateToken, authorize, checkPermission, optionalAuth } = require('../middleware/auth');
 const logger = require('../utils/logger');
 const { Op } = require('sequelize');
 
@@ -10,7 +10,7 @@ const router = express.Router();
 // @route   GET /api/transparencia
 // @desc    Obtener todos los documentos de transparencia
 // @access  Public
-router.get('/', [
+router.get('/', optionalAuth, [
   query('year').optional().isInt({ min: 2020, max: 2030 }).withMessage('Año inválido'),
   query('mes').optional().isString().withMessage('Mes debe ser texto'),
   query('literal').optional().isString().withMessage('Literal debe ser texto'),
@@ -99,7 +99,7 @@ router.get('/', [
 // @route   GET /api/transparencia/:id
 // @desc    Obtener documento de transparencia por ID
 // @access  Public
-router.get('/:id', async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const transparencia = await Transparencia.findByPk(req.params.id, {
       include: [
@@ -375,7 +375,7 @@ router.post('/:id/publish', authenticateToken, checkPermission('manage_transpare
 // @route   GET /api/transparencia/years/list
 // @desc    Obtener lista de años
 // @access  Public
-router.get('/years/list', async (req, res) => {
+router.get('/years/list', optionalAuth, async (req, res) => {
   try {
     const years = await Transparencia.getYears();
 
@@ -396,7 +396,7 @@ router.get('/years/list', async (req, res) => {
 // @route   GET /api/transparencia/meses/list
 // @desc    Obtener lista de meses
 // @access  Public
-router.get('/meses/list', async (req, res) => {
+router.get('/meses/list', optionalAuth, async (req, res) => {
   try {
     const meses = await Transparencia.getMeses();
 
@@ -417,7 +417,7 @@ router.get('/meses/list', async (req, res) => {
 // @route   GET /api/transparencia/literales/list
 // @desc    Obtener lista de literales
 // @access  Public
-router.get('/literales/list', async (req, res) => {
+router.get('/literales/list', optionalAuth, async (req, res) => {
   try {
     const literales = await Transparencia.getLiterales();
 
@@ -438,7 +438,7 @@ router.get('/literales/list', async (req, res) => {
 // @route   GET /api/transparencia/statistics
 // @desc    Obtener estadísticas de transparencia
 // @access  Public
-router.get('/statistics', async (req, res) => {
+router.get('/statistics', optionalAuth, async (req, res) => {
   try {
     const statistics = await Transparencia.getStatistics();
 

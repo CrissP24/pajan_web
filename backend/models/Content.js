@@ -111,10 +111,10 @@ const Content = sequelize.define('Content', {
       fields: ['status']
     },
     {
-      fields: ['isPublic']
+      fields: ['is_public']
     },
     {
-      fields: ['publishedAt']
+      fields: ['published_at']
     },
     {
       fields: ['user_id']

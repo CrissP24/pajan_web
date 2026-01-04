@@ -62,3 +62,15 @@ export const searchAttachments = (query, params = {}) =>
     params: { search: query, ...params },
     headers: getAuthHeaders()
   });
+
+// Default export
+export default {
+  uploadAttachment,
+  getAttachments,
+  getAttachmentById,
+  downloadAttachment,
+  updateAttachment,
+  deleteAttachment,
+  getAttachmentCategories,
+  searchAttachments
+};

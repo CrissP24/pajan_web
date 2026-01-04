@@ -15,7 +15,7 @@ import ComunicacionDashboard from './components/dashboards/ComunicacionDashboard
 import TransparenciaDashboard from './components/dashboards/TransparenciaDashboard';
 import DocumentManagement from './pages/DocumentManagement';
 import TestPage from './pages/TestPage';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 
 // Importar las páginas existentes
 import MisionVision from './pages/MisionVision';
@@ -309,11 +309,9 @@ function AppWrapper() {
 // Main wrapper con router
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppWrapper />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AppWrapper />
+    </Router>
   );
 }
 

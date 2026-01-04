@@ -134,10 +134,10 @@ const Document = sequelize.define('Document', {
       fields: ['status']
     },
     {
-      fields: ['isPublic']
+      fields: ['is_public']
     },
     {
-      fields: ['publishedAt']
+      fields: ['published_at']
     },
     {
       fields: ['year']

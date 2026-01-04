@@ -1,10 +1,24 @@
-const { User, Content, Document, News, PresidenteBarrial, RendicionCuenta, Transparencia } = require('../models');
+const { sequelize, User, Content, Document, News, PresidenteBarrial, RendicionCuenta, Transparencia } = require('../models');
 const bcrypt = require('bcryptjs');
 const logger = require('../utils/logger');
 
 async function seed() {
   try {
     logger.info('Iniciando seed de datos iniciales...');
+
+    // Asegurar conexión y sincronizar modelos antes de insertar datos
+    console.log('Seed: autenticando conexión...');
+    logger.info('Seed: autenticando conexión...');
+    await sequelize.authenticate();
+    console.log('Seed: autenticado.');
+    if (process.env.SKIP_SYNC === 'true') {
+      console.log('Seed: SKIP_SYNC=true, saltando sincronización de modelos.');
+    } else {
+      console.log('Seed: sincronizando modelos...');
+      await sequelize.sync({ alter: true });
+    }
+    logger.info('Conexión verificada y modelos sincronizados para seed.');
+    console.log('Conexión verificada y modelos sincronizados para seed.');
 
     // Crear usuarios por defecto
     const users = [
@@ -56,10 +70,14 @@ async function seed() {
     ];
 
     for (const userData of users) {
+      console.log(`Verificando usuario: ${userData.username}`);
       const existingUser = await User.findOne({ where: { username: userData.username } });
       if (!existingUser) {
         await User.create(userData);
         logger.info(`Usuario ${userData.username} creado`);
+        console.log(`Usuario ${userData.username} creado`);
+      } else {
+        console.log(`Usuario ${userData.username} ya existe`);
       }
     }
 
@@ -138,6 +156,9 @@ async function seed() {
       if (!existingContent) {
         await Content.create(contentData);
         logger.info(`Contenido ${contentData.title} creado`);
+        console.log(`Contenido ${contentData.title} creado`);
+      } else {
+        console.log(`Contenido ${contentData.title} ya existe`);
       }
     }
 
@@ -176,6 +197,9 @@ async function seed() {
       if (!existingNews) {
         await News.create(newsData);
         logger.info(`Noticia ${newsData.title} creada`);
+        console.log(`Noticia ${newsData.title} creada`);
+      } else {
+        console.log(`Noticia ${newsData.title} ya existe`);
       }
     }
 
@@ -223,7 +247,7 @@ async function seed() {
     const initialRendicion = [
       {
         year: 2024,
-        fase: 'FASE 1: PLANIFICACIÓN Y FACILITACIÓN DEL PROCESO POR LA CIUDADANÍA',
+        fase: 'FASE_1',
         titulo: 'Matriz de Consulta Ciudadana 2024',
         descripcion: 'Documento que contiene la matriz de consulta ciudadana para el proceso de rendición de cuentas 2024.',
         archivo_url: 'https://ejemplo.com/rendicion/2024/fase1/matriz-consulta.pdf',
@@ -234,7 +258,7 @@ async function seed() {
       },
       {
         year: 2024,
-        fase: 'FASE 2: EVALUACIÓN DE LA GESTIÓN INSTITUCIONAL Y ELABORACIÓN DEL INFORME DE RENDICIÓN DE CUENTAS',
+        fase: 'FASE_2',
         titulo: 'Informe de Gestión 2024',
         descripcion: 'Informe detallado de la gestión institucional del GAD Municipal de Paján durante el año 2024.',
         archivo_url: 'https://ejemplo.com/rendicion/2024/fase2/informe-gestion.pdf',

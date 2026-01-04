@@ -51,7 +51,7 @@ const User = sequelize.define('User', {
     allowNull: true
   },
   roles: {
-    type: DataTypes.JSON,
+    type: DataTypes.JSONB,
     allowNull: false,
     defaultValue: ['user'],
     validate: {
@@ -112,7 +112,8 @@ const User = sequelize.define('User', {
       fields: ['active']
     },
     {
-      fields: ['roles']
+      fields: ['roles'],
+      using: 'gin'
     }
   ],
   hooks: {

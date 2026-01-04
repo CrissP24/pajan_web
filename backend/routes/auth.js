@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { User, AuditLog } = require('../models');
+const { sequelize, User, AuditLog } = require('../models');
 const { authenticateToken } = require('../middleware/auth');
 const logger = require('../utils/logger');
 

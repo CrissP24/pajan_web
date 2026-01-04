@@ -17,10 +17,10 @@ const RendicionCuenta = sequelize.define('RendicionCuenta', {
   },
   fase: {
     type: DataTypes.ENUM(
-      'FASE 1: PLANIFICACIÓN Y FACILITACIÓN DEL PROCESO POR LA CIUDADANÍA',
-      'FASE 2: EVALUACIÓN DE LA GESTIÓN INSTITUCIONAL Y ELABORACIÓN DEL INFORME DE RENDICIÓN DE CUENTAS',
-      'FASE 3: DELIBERACIÓN PÚBLICA Y EVALUACIÓN CIUDADANA DEL INFORME DE RENDICIÓN DE CUENTAS',
-      'FASE 4: INCORPORACIÓN DE LA OPINIÓN CIUDADANA, RETROALIMENTACIÓN Y SEGUIMIENTO'
+      'FASE_1',
+      'FASE_2',
+      'FASE_3',
+      'FASE_4'
     ),
     allowNull: false
   },
@@ -110,10 +110,10 @@ const RendicionCuenta = sequelize.define('RendicionCuenta', {
       fields: ['status']
     },
     {
-      fields: ['isPublic']
+      fields: ['is_public']
     },
     {
-      fields: ['publishedAt']
+      fields: ['published_at']
     },
     {
       fields: ['user_id']

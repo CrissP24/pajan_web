@@ -43,11 +43,20 @@ export const AuthProvider = ({ children }) => {
             setUser(verification.user);
           } else {
             // Token inválido, limpiar sesión
-            logout();
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
           }
         } catch (error) {
           console.error('Error verificando token:', error);
-          logout();
+          // Limpiar sesión local
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
         }
       }
       setLoading(false);

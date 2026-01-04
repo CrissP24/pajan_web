@@ -67,22 +67,23 @@ const Transparencia = () => {
   }, [selectedYear, selectedMonth]);
 
   const checkUser = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       axios.get(`${API_URL}/api/auth/me`, {
-        headers: { 'x-access-token': token }
+        headers: { Authorization: `Bearer ${token}` }
       })
-        .then(res => setUser(res.data))
+        .then(res => setUser(res.data.data || res.data))
         .catch(() => setUser(null));
     }
   };
 
   const loadYears = () => {
-    axios.get(`${API_URL}/api/transparencia/years`)
+    axios.get(`${API_URL}/api/transparencia/years/list`)
       .then(res => {
-        setYears(res.data.map(item => item.year));
-        if (res.data.length > 0 && !selectedYear) {
-          setSelectedYear(res.data[0].year);
+        const data = res.data.data || res.data;
+        setYears(data.map(item => item));
+        if (data.length > 0 && !selectedYear) {
+          setSelectedYear(data[0]);
         }
       })
       .catch(err => console.error('Error cargando años:', err))
@@ -91,19 +92,26 @@ const Transparencia = () => {
 
   const loadDocuments = (year, month) => {
     setLoading(true);
-    axios.get(`${API_URL}/api/transparencia/year/${year}/month/${month}`)
-      .then(res => setDocuments(res.data))
+    axios.get(`${API_URL}/api/transparencia`, {
+      params: { year, mes: month, limit: 200 }
+    })
+      .then(res => {
+        const data = res.data.data || res.data;
+        // backend devuelve { success: true, data: { transparencia: [...], pagination: {...} } }
+        const docs = data.transparencia || data;
+        setDocuments(docs);
+      })
       .catch(err => console.error('Error cargando documentos:', err))
       .finally(() => setLoading(false));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     
     if (editingDoc) {
       axios.put(`${API_URL}/api/transparencia/${editingDoc.id}`, formData, {
-        headers: { 'x-access-token': token }
+        headers: { Authorization: `Bearer ${token}` }
       })
         .then(() => {
           setShowForm(false);
@@ -114,7 +122,7 @@ const Transparencia = () => {
         .catch(err => alert('Error al actualizar documento'));
     } else {
       axios.post(`${API_URL}/api/transparencia`, formData, {
-        headers: { 'x-access-token': token }
+        headers: { Authorization: `Bearer ${token}` }
       })
         .then(() => {
           setShowForm(false);
@@ -141,9 +149,9 @@ const Transparencia = () => {
 
   const handleDelete = (id) => {
     if (window.confirm('¿Está seguro de eliminar este documento?')) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       axios.delete(`${API_URL}/api/transparencia/${id}`, {
-        headers: { 'x-access-token': token }
+        headers: { Authorization: `Bearer ${token}` }
       })
         .then(() => loadDocuments(selectedYear, selectedMonth))
         .catch(err => alert('Error al eliminar documento'));
