@@ -1,53 +1,70 @@
 /**
- * Servicio de autenticación conectado al backend
+ * Servicio de autenticación basado en localStorage
  */
 
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import localStorageService from './localStorageService';
 
 class AuthService {
   // Login de usuario
   async login(username, password) {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        username,
-        password
-      });
+      // Obtener usuarios de localStorage
+      const users = localStorageService.getItem('users', []);
 
-      if (response.data.success) {
-        const { accessToken, refreshToken, user } = response.data.data;
-        
-        // Guardar tokens en localStorage
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
+      // Buscar usuario
+      const user = users.find(u =>
+        (u.username === username || u.email === username) && u.active
+      );
 
+      if (!user) {
         return {
-          success: true,
-          accessToken,
-          refreshToken,
-          user
+          success: false,
+          error: 'Credenciales inválidas'
         };
       }
 
+      // Verificar contraseña (en producción esto sería con hash)
+      if (user.password !== password) {
+        return {
+          success: false,
+          error: 'Credenciales inválidas'
+        };
+      }
+
+      // Generar tokens simulados
+      const accessToken = this.generateAccessToken(user);
+      const refreshToken = this.generateRefreshToken(user);
+
+      // Actualizar último login
+      const updatedUser = {
+        ...user,
+        lastLogin: new Date().toISOString()
+      };
+      localStorageService.updateInArray('users', user.id, { lastLogin: new Date().toISOString() });
+
+      // Guardar tokens y usuario en localStorage
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      // Log de auditoría
+      localStorageService.logActivity(updatedUser, 'LOGIN', {
+        ip: '127.0.0.1',
+        userAgent: navigator.userAgent,
+        description: `Usuario ${user.username} inició sesión`
+      });
+
       return {
-        success: false,
-        error: response.data.message || 'Error en el login'
+        success: true,
+        accessToken,
+        refreshToken,
+        user: updatedUser
       };
     } catch (error) {
       console.error('Error en login:', error);
-      
-      if (error.response?.data?.message) {
-        return {
-          success: false,
-          error: error.response.data.message
-        };
-      }
-      
       return {
         success: false,
-        error: 'Error de conexión con el servidor'
+        error: 'Error interno del sistema'
       };
     }
   }
@@ -55,26 +72,29 @@ class AuthService {
   // Logout de usuario
   async logout() {
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      if (token) {
-        try {
-          await axios.post(`${API_URL}/api/auth/logout`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-        } catch (error) {
-          console.warn('Error notificando logout al servidor:', error);
-        }
+      const user = this.getCurrentUser();
+
+      if (user) {
+        // Log de auditoría
+        localStorageService.logActivity(user, 'LOGOUT', {
+          ip: '127.0.0.1',
+          userAgent: navigator.userAgent,
+          description: `Usuario ${user.username} cerró sesión`
+        });
       }
 
       // Limpiar localStorage
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
-      
+
       return { success: true };
     } catch (error) {
       console.error('Error en logout:', error);
+      // Limpiar de todas formas
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       return { success: false, error: 'Error al cerrar sesión' };
     }
   }
@@ -86,31 +106,36 @@ class AuthService {
         return { success: false, error: 'Token no proporcionado' };
       }
 
-      const response = await axios.get(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data.success) {
-        return {
-          success: true,
-          user: response.data.data
-        };
+      const decoded = this.decodeToken(token);
+      if (!decoded) {
+        return { success: false, error: 'Token inválido' };
       }
 
-      return { success: false, error: 'Token inválido' };
-    } catch (error) {
-      console.error('Error verificando token:', error);
-      
-      if (error.response?.status === 401) {
+      // Verificar expiración
+      if (this.isTokenExpired(token)) {
         return { success: false, error: 'Token expirado' };
       }
-      
+
+      // Obtener usuario actualizado
+      const users = localStorageService.getItem('users', []);
+      const user = users.find(u => u.id === decoded.userId && u.active);
+
+      if (!user) {
+        return { success: false, error: 'Usuario no encontrado' };
+      }
+
+      return {
+        success: true,
+        user: user
+      };
+    } catch (error) {
+      console.error('Error verificando token:', error);
       return { success: false, error: 'Error verificando token' };
     }
   }
 
   // Obtener usuario actual
-  async getCurrentUser() {
+  getCurrentUser() {
     try {
       const userStr = localStorage.getItem('user');
       if (!userStr) {
@@ -119,24 +144,22 @@ class AuthService {
 
       const user = JSON.parse(userStr);
       const token = localStorage.getItem('accessToken');
-      
+
       if (!token) {
         return null;
       }
 
       // Verificar si el token sigue siendo válido
-      const verification = await this.verifyToken(token);
-      if (verification.success) {
-        return verification.user;
+      if (this.isTokenExpired(token)) {
+        // Intentar renovar el token
+        const refreshResult = this.refreshToken();
+        if (refreshResult.success) {
+          return refreshResult.user;
+        }
+        return null;
       }
 
-      // Intentar renovar el token
-      const refreshResult = await this.refreshToken();
-      if (refreshResult.success) {
-        return refreshResult.user;
-      }
-
-      return null;
+      return user;
     } catch (error) {
       console.error('Error obteniendo usuario actual:', error);
       return null;
@@ -202,6 +225,18 @@ class AuthService {
     return btoa(JSON.stringify(payload));
   }
 
+  // Generar refresh token (simulado)
+  generateRefreshToken(user) {
+    const payload = {
+      userId: user.id,
+      username: user.username,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 días
+    };
+
+    return btoa(JSON.stringify(payload));
+  }
+
   // Decodificar token (simulado)
   decodeToken(token) {
     try {
@@ -228,29 +263,39 @@ class AuthService {
   }
 
   // Renovar token
-  async refreshToken() {
+  refreshToken() {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
         return { success: false, error: 'No hay refresh token' };
       }
 
-      const response = await axios.post(`${API_URL}/api/auth/refresh`, {
-        refreshToken
-      });
-
-      if (response.data.success) {
-        const { accessToken } = response.data.data;
-        localStorage.setItem('accessToken', accessToken);
-        
-        return {
-          success: true,
-          accessToken,
-          user: JSON.parse(localStorage.getItem('user'))
-        };
+      if (this.isTokenExpired(refreshToken)) {
+        return { success: false, error: 'Refresh token expirado' };
       }
 
-      return { success: false, error: 'Error renovando token' };
+      const decoded = this.decodeToken(refreshToken);
+      if (!decoded) {
+        return { success: false, error: 'Refresh token inválido' };
+      }
+
+      // Obtener usuario
+      const users = localStorageService.getItem('users', []);
+      const user = users.find(u => u.id === decoded.userId && u.active);
+
+      if (!user) {
+        return { success: false, error: 'Usuario no encontrado' };
+      }
+
+      // Generar nuevo access token
+      const accessToken = this.generateAccessToken(user);
+      localStorage.setItem('accessToken', accessToken);
+
+      return {
+        success: true,
+        accessToken,
+        user: user
+      };
     } catch (error) {
       console.error('Error renovando token:', error);
       return { success: false, error: 'Error renovando token' };
@@ -258,60 +303,76 @@ class AuthService {
   }
 
   // Cambiar contraseña
-  async changePassword(currentPassword, newPassword) {
+  async changePassword(userId, currentPassword, newPassword) {
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      const response = await axios.post(`${API_URL}/api/auth/change-password`, {
-        currentPassword,
-        newPassword
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const users = localStorageService.getItem('users', []);
+      const user = users.find(u => u.id === userId);
 
-      if (response.data.success) {
-        return { 
-          success: true, 
-          message: response.data.message || 'Contraseña actualizada exitosamente' 
-        };
+      if (!user) {
+        return { success: false, error: 'Usuario no encontrado' };
       }
 
-      return { 
-        success: false, 
-        error: response.data.message || 'Error actualizando contraseña' 
+      // Verificar contraseña actual
+      if (user.password !== currentPassword) {
+        return { success: false, error: 'Contraseña actual incorrecta' };
+      }
+
+      // Actualizar contraseña
+      localStorageService.updateInArray('users', userId, {
+        password: newPassword,
+        passwordChangedAt: new Date().toISOString()
+      });
+
+      // Log de auditoría
+      localStorageService.logActivity(user, 'UPDATE', {
+        entity: 'User',
+        entityId: userId,
+        description: `Usuario ${user.username} cambió su contraseña`
+      });
+
+      return {
+        success: true,
+        message: 'Contraseña actualizada exitosamente'
       };
     } catch (error) {
       console.error('Error cambiando contraseña:', error);
-      
-      if (error.response?.data?.message) {
-        return {
-          success: false,
-          error: error.response.data.message
-        };
-      }
-      
       return { success: false, error: 'Error interno del servidor' };
     }
   }
 
-  // Obtener sesiones activas
+  // Obtener sesiones activas (simulado)
   async getActiveSessions() {
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      const response = await axios.get(`${API_URL}/api/admin/audit-logs`, {
-        params: { action: 'LOGIN', limit: 100 },
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const auditLogs = localStorageService.getItem('audit_logs', []);
 
-      if (response.data.success) {
-        return response.data.data.logs;
-      }
+      // Filtrar logs de login recientes (últimas 24 horas)
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
-      return [];
+      return auditLogs
+        .filter(log => log.action === 'LOGIN' && new Date(log.timestamp) > oneDayAgo)
+        .slice(0, 100); // Últimas 100 sesiones
     } catch (error) {
       console.error('Error obteniendo sesiones activas:', error);
       return [];
+    }
+  }
+
+  // Obtener información del usuario actual (para /me)
+  async getMe() {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) {
+        return { success: false, error: 'Usuario no autenticado' };
+      }
+
+      return {
+        success: true,
+        data: user
+      };
+    } catch (error) {
+      console.error('Error obteniendo información del usuario:', error);
+      return { success: false, error: 'Error interno del servidor' };
     }
   }
 }

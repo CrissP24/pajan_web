@@ -18,8 +18,8 @@ const Home = () => {
   const loadContent = async () => {
     try {
       const data = await contentManagementService.getContentBySection('inicio');
-      // Filtrar solo contenido publicado
-      const publishedContent = data.filter(item => item.published);
+      // Filtrar solo contenido con status 'published'
+      const publishedContent = data.filter(item => item.status === 'published');
       setContent(publishedContent);
     } catch (err) {
       console.error('Error cargando contenido:', err);
@@ -34,7 +34,7 @@ const Home = () => {
       const data = await newsManagementService.getPublishedNews();
       // Ordenar por fecha descendente y tomar solo las primeras 6
       const sortedNews = data
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .sort((a, b) => new Date(b.publishedAt || b.createdAt) - new Date(a.publishedAt || a.createdAt))
         .slice(0, 6);
       setNews(sortedNews);
     } catch (err) {

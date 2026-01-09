@@ -1,200 +1,309 @@
+/**
+ * Servicio de gestión de presupuesto basado en localStorage
+ */
+
 import localStorageService from './localStorageService';
-import { v4 as uuidv4 } from 'uuid';
-import adminService from './adminService';
+import authService from './authService';
 
-const BUDGET_KEY = 'budget_data';
-const BUDGET_SECTIONS_KEY = 'budget_sections_data';
+class BudgetService {
 
-const defaultBudgetSections = [
-  {
-    id: 'budget-section-1',
-    title: 'Transparencia Presupuestaria',
-    content: 'El GAD Municipal de Paján mantiene un compromiso firme con la transparencia en la gestión de los recursos públicos. Aquí podrás encontrar información detallada sobre nuestro presupuesto anual, ejecución financiera y rendición de cuentas.',
-    additionalContent: 'Nuestro presupuesto está diseñado para promover el desarrollo integral del cantón, priorizando las necesidades de la comunidad y garantizando el uso eficiente de los recursos públicos.',
-    icon: 'dollar',
-    published: true,
-    order: 1,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'budget-section-2',
-    title: 'Presupuesto Anual 2024',
-    content: 'Información detallada del presupuesto municipal para el año 2024, incluyendo ingresos, gastos y proyectos prioritarios.',
-    additionalContent: 'El presupuesto 2024 se enfoca en el desarrollo de infraestructura, servicios básicos y programas sociales para beneficio de toda la comunidad.',
-    icon: 'chart',
-    published: true,
-    order: 2,
-    createdAt: new Date().toISOString()
-  }
-];
+  // Obtener secciones de presupuesto
+  async getBudgetSections(options = {}) {
+    try {
+      let sections = localStorageService.getItem('budget_sections', []);
 
-const defaultBudgetData = [
-  {
-    id: 'budget-2024',
-    year: 2024,
-    totalIncome: 2500000.00,
-    totalExpenses: 2400000.00,
-    categories: [
-      {
-        name: 'Ingresos Corrientes',
-        amount: 1800000.00,
-        percentage: 72,
-        subcategories: [
-          { name: 'Impuestos', amount: 1200000.00 },
-          { name: 'Tasas y Contribuciones', amount: 400000.00 },
-          { name: 'Transferencias', amount: 200000.00 }
-        ]
-      },
-      {
-        name: 'Ingresos de Capital',
-        amount: 700000.00,
-        percentage: 28,
-        subcategories: [
-          { name: 'Préstamos', amount: 500000.00 },
-          { name: 'Donaciones', amount: 200000.00 }
-        ]
+      // Aplicar filtros
+      const { published = true, page = 1, limit = 10 } = options;
+
+      if (published !== undefined) {
+        sections = sections.filter(s => s.published === published);
       }
-    ],
-    expenses: [
-      {
-        name: 'Gastos de Personal',
-        amount: 1200000.00,
-        percentage: 50
-      },
-      {
-        name: 'Bienes y Servicios',
-        amount: 600000.00,
-        percentage: 25
-      },
-      {
-        name: 'Inversión Pública',
-        amount: 400000.00,
-        percentage: 17
-      },
-      {
-        name: 'Otros Gastos',
-        amount: 200000.00,
-        percentage: 8
-      }
-    ],
-    published: true,
-    createdAt: new Date().toISOString()
+
+      // Ordenar por orden
+      sections.sort((a, b) => a.order - b.order);
+
+      // Paginación
+      const total = sections.length;
+      const offset = (page - 1) * limit;
+      const paginatedSections = sections.slice(offset, offset + limit);
+
+      return {
+        success: true,
+        data: {
+          sections: paginatedSections,
+          pagination: {
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            pages: Math.ceil(total / limit)
+          }
+        }
+      };
+    } catch (error) {
+      console.error('Error obteniendo secciones de presupuesto:', error);
+      return {
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
   }
-];
 
-// Inicializar datos por defecto si no existen
-if (!localStorageService.getItem(BUDGET_SECTIONS_KEY)) {
-  localStorageService.setItem(BUDGET_SECTIONS_KEY, defaultBudgetSections);
-}
-if (!localStorageService.getItem(BUDGET_KEY)) {
-  localStorageService.setItem(BUDGET_KEY, defaultBudgetData);
-}
+  // Obtener sección de presupuesto por ID
+  async getBudgetSectionById(id) {
+    try {
+      const sections = localStorageService.getItem('budget_sections', []);
+      const section = sections.find(s => s.id === id);
 
-const budgetService = {
-  getBudgetSections: async () => {
-    return localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-  },
+      if (!section) {
+        return {
+          success: false,
+          error: 'Sección de presupuesto no encontrada'
+        };
+      }
 
-  getPublishedBudgetSections: async () => {
-    const allSections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    return allSections.filter(section => section.published).sort((a, b) => a.order - b.order);
-  },
+      return {
+        success: true,
+        data: section
+      };
+    } catch (error) {
+      console.error('Error obteniendo sección de presupuesto:', error);
+      return {
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
+  }
 
-  getBudgetSectionById: async (id) => {
-    const allSections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    return allSections.find(section => section.id === id);
-  },
+  // Crear sección de presupuesto
+  async createBudgetSection(sectionData) {
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          error: 'Usuario no autenticado'
+        };
+      }
 
-  createBudgetSection: async (sectionData) => {
-    const allSections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    const newSection = { 
-      id: uuidv4(), 
-      ...sectionData, 
-      published: true, 
-      createdAt: new Date().toISOString() 
-    };
-    allSections.push(newSection);
-    localStorageService.setItem(BUDGET_SECTIONS_KEY, allSections);
-    adminService.logActivity('budget_section_created', `Sección de presupuesto "${newSection.title}" creada`);
-    return newSection;
-  },
+      const sections = localStorageService.getItem('budget_sections', []);
 
-  updateBudgetSection: async (id, updatedData) => {
-    let allSections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    allSections = allSections.map(section => 
-      section.id === id ? { ...section, ...updatedData, updatedAt: new Date().toISOString() } : section
-    );
-    localStorageService.setItem(BUDGET_SECTIONS_KEY, allSections);
-    adminService.logActivity('budget_section_updated', `Sección de presupuesto "${updatedData.title || id}" actualizada`);
-    return allSections.find(section => section.id === id);
-  },
+      // Crear nueva sección
+      const newSection = {
+        id: localStorageService.generateId(),
+        title: sectionData.title,
+        content: sectionData.content,
+        additionalContent: sectionData.additionalContent || '',
+        icon: sectionData.icon || 'dollar-sign',
+        published: sectionData.published !== undefined ? sectionData.published : true,
+        order: sectionData.order || 0,
+        user_id: currentUser.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
 
-  deleteBudgetSection: async (id) => {
-    let allSections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    const deletedSection = allSections.find(section => section.id === id);
-    allSections = allSections.filter(section => section.id !== id);
-    localStorageService.setItem(BUDGET_SECTIONS_KEY, allSections);
-    adminService.logActivity('budget_section_deleted', `Sección de presupuesto "${deletedSection?.title || id}" eliminada`);
-    return true;
-  },
+      localStorageService.addToArray('budget_sections', newSection);
 
-  getBudgetData: async () => {
-    return localStorageService.getItem(BUDGET_KEY, []);
-  },
+      // Log de auditoría
+      localStorageService.logActivity(currentUser, 'CREATE', {
+        entity: 'BudgetSection',
+        entityId: newSection.id,
+        newValues: newSection,
+        description: `Usuario ${currentUser.username} creó la sección de presupuesto "${newSection.title}"`
+      });
 
-  getPublishedBudgetData: async () => {
-    const allBudgetData = localStorageService.getItem(BUDGET_KEY, []);
-    return allBudgetData.filter(budget => budget.published);
-  },
+      return {
+        success: true,
+        message: 'Sección de presupuesto creada exitosamente',
+        data: newSection
+      };
+    } catch (error) {
+      console.error('Error creando sección de presupuesto:', error);
+      return {
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
+  }
 
-  getBudgetByYear: async (year) => {
-    const allBudgetData = localStorageService.getItem(BUDGET_KEY, []);
-    return allBudgetData.find(budget => budget.year === year && budget.published);
-  },
+  // Actualizar sección de presupuesto
+  async updateBudgetSection(id, sectionData) {
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          error: 'Usuario no autenticado'
+        };
+      }
 
-  createBudgetData: async (budgetData) => {
-    const allBudgetData = localStorageService.getItem(BUDGET_KEY, []);
-    const newBudget = { 
-      id: uuidv4(), 
-      ...budgetData, 
-      published: true, 
-      createdAt: new Date().toISOString() 
-    };
-    allBudgetData.push(newBudget);
-    localStorageService.setItem(BUDGET_KEY, allBudgetData);
-    adminService.logActivity('budget_data_created', `Datos de presupuesto ${newBudget.year} creados`);
-    return newBudget;
-  },
+      const sections = localStorageService.getItem('budget_sections', []);
+      const section = sections.find(s => s.id === id);
 
-  updateBudgetData: async (id, updatedData) => {
-    let allBudgetData = localStorageService.getItem(BUDGET_KEY, []);
-    allBudgetData = allBudgetData.map(budget => 
-      budget.id === id ? { ...budget, ...updatedData, updatedAt: new Date().toISOString() } : budget
-    );
-    localStorageService.setItem(BUDGET_KEY, allBudgetData);
-    adminService.logActivity('budget_data_updated', `Datos de presupuesto ${updatedData.year || id} actualizados`);
-    return allBudgetData.find(budget => budget.id === id);
-  },
+      if (!section) {
+        return {
+          success: false,
+          error: 'Sección de presupuesto no encontrada'
+        };
+      }
 
-  deleteBudgetData: async (id) => {
-    let allBudgetData = localStorageService.getItem(BUDGET_KEY, []);
-    const deletedBudget = allBudgetData.find(budget => budget.id === id);
-    allBudgetData = allBudgetData.filter(budget => budget.id !== id);
-    localStorageService.setItem(BUDGET_KEY, allBudgetData);
-    adminService.logActivity('budget_data_deleted', `Datos de presupuesto ${deletedBudget?.year || id} eliminados`);
-    return true;
-  },
+      const oldValues = { ...section };
 
-  getBudgetStats: async () => {
-    const sections = localStorageService.getItem(BUDGET_SECTIONS_KEY, []);
-    const budgetData = localStorageService.getItem(BUDGET_KEY, []);
+      // Preparar datos de actualización
+      const updateData = {
+        updatedAt: new Date().toISOString()
+      };
+
+      if (sectionData.title !== undefined) updateData.title = sectionData.title;
+      if (sectionData.content !== undefined) updateData.content = sectionData.content;
+      if (sectionData.additionalContent !== undefined) updateData.additionalContent = sectionData.additionalContent;
+      if (sectionData.icon !== undefined) updateData.icon = sectionData.icon;
+      if (sectionData.published !== undefined) updateData.published = sectionData.published;
+      if (sectionData.order !== undefined) updateData.order = sectionData.order;
+
+      const updatedSection = localStorageService.updateInArray('budget_sections', id, updateData);
+
+      // Log de auditoría
+      localStorageService.logActivity(currentUser, 'UPDATE', {
+        entity: 'BudgetSection',
+        entityId: id,
+        oldValues,
+        newValues: updatedSection,
+        description: `Usuario ${currentUser.username} actualizó la sección de presupuesto "${updatedSection.title}"`
+      });
+
+      return {
+        success: true,
+        message: 'Sección de presupuesto actualizada exitosamente',
+        data: updatedSection
+      };
+    } catch (error) {
+      console.error('Error actualizando sección de presupuesto:', error);
+      return {
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
+  }
+
+  // Eliminar sección de presupuesto
+  async deleteBudgetSection(id) {
+    try {
+      const currentUser = authService.getCurrentUser();
+      if (!currentUser) {
+        return {
+          success: false,
+          error: 'Usuario no autenticado'
+        };
+      }
+
+      const sections = localStorageService.getItem('budget_sections', []);
+      const section = sections.find(s => s.id === id);
+
+      if (!section) {
+        return {
+          success: false,
+          error: 'Sección de presupuesto no encontrada'
+        };
+      }
+
+      const oldValues = { ...section };
+      const deleted = localStorageService.removeFromArray('budget_sections', id);
+
+      if (!deleted) {
+        return {
+          success: false,
+          error: 'Error eliminando sección de presupuesto'
+        };
+      }
+
+      // Log de auditoría
+      localStorageService.logActivity(currentUser, 'DELETE', {
+        entity: 'BudgetSection',
+        entityId: id,
+        oldValues,
+        description: `Usuario ${currentUser.username} eliminó la sección de presupuesto "${section.title}"`
+      });
+
+      return {
+        success: true,
+        message: 'Sección de presupuesto eliminada exitosamente'
+      };
+    } catch (error) {
+      console.error('Error eliminando sección de presupuesto:', error);
+      return {
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
+  }
+
+  // Obtener secciones publicadas (para compatibilidad)
+  async getPublishedBudgetSections() {
+    const result = await this.getBudgetSections({ published: true });
+    return result.success ? result.data.sections : [];
+  }
+
+  // Obtener estadísticas de presupuesto
+  async getBudgetStats() {
+    try {
+      const sections = localStorageService.getItem('budget_sections', []);
+
+      const totalSections = sections.length;
+      const publishedSections = sections.filter(s => s.published).length;
+
+      return {
+        success: true,
+        data: {
+          totalSections,
+          publishedSections
+        }
+      };
+    } catch (error) {
+      console.error('Error obteniendo estadísticas de presupuesto:', error);
     return {
-      totalSections: sections.length,
-      publishedSections: sections.filter(s => s.published).length,
-      totalBudgetYears: budgetData.length,
-      publishedBudgetYears: budgetData.filter(b => b.published).length
+        success: false,
+        error: 'Error interno del servidor'
+      };
+    }
+  }
+
+  // Crear sección (método de compatibilidad)
+  async createBudgetSectionLegacy(sectionData) {
+    const result = await this.createBudgetSection(sectionData);
+    return result.success ? result.data : null;
+  }
+
+  // Actualizar sección (método de compatibilidad)
+  async updateBudgetSectionLegacy(id, sectionData) {
+    const result = await this.updateBudgetSection(id, sectionData);
+    return result.success ? result.data : null;
+  }
+
+  // Eliminar sección (método de compatibilidad)
+  async deleteBudgetSectionLegacy(id) {
+    const result = await this.deleteBudgetSection(id);
+    return result.success;
+  }
+
+  // Obtener estadísticas (método de compatibilidad)
+  async getBudgetStatsLegacy() {
+    const result = await this.getBudgetStats();
+    return result.success ? result.data : {
+      totalSections: 0,
+      publishedSections: 0
     };
   }
-};
+}
+
+// Crear instancia y exports para compatibilidad
+const budgetService = new BudgetService();
+
+// Exports para compatibilidad con código existente
+export const getBudgetSections = () => budgetService.getPublishedBudgetSections();
+export const getBudgetSectionById = (id) => budgetService.getBudgetSectionById(id).then(r => r.success ? r.data : null);
+export const createBudgetSection = (data) => budgetService.createBudgetSectionLegacy(data);
+export const updateBudgetSection = (id, data) => budgetService.updateBudgetSectionLegacy(id, data);
+export const deleteBudgetSection = (id) => budgetService.deleteBudgetSectionLegacy(id);
+export const getBudgetStats = () => budgetService.getBudgetStatsLegacy();
 
 export default budgetService;
