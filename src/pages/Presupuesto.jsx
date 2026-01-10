@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Alert, Tabs, Tab } from 'react-bootstrap';
 import './PublicPages.css';
-import * as FaIcons from 'react-icons/fa';
+import { FaChartBar, FaDollarSign, FaDownload, FaEye, FaFileAlt, FaCalculator, FaBalanceScale, FaArrowDown, FaArrowUp } from 'react-icons/fa';
 
-// Desestructuramos los iconos que sí deberían existir y creamos un fallback
-const {
-  FaChartBar,
-  FaDollarSign,
-  FaDownload,
-  FaEye,
-  FaFileAlt,
-  FaCalculator,
-  FaTrendingUp,
-  FaBalanceScale
-} = FaIcons;
-
-// `FaTrendingDown` no existe en algunas versiones; usamos un fallback seguro
-const FaTrendingDown = FaIcons.FaTrendingDown || FaIcons.FaArrowDown || FaIcons.FaLongArrowAltDown || FaIcons.FaSortDown || FaIcons.FaChevronDown || FaIcons.FaCaretDown;
+// Alias claros para los íconos de tendencia (compatibles con react-icons/fa)
+const FaTrendingDown = FaArrowDown;
+const FaTrendingUp = FaArrowUp;
 import budgetService from '../services/budgetService';
 
 const Presupuesto = () => {
